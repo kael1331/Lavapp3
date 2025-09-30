@@ -1996,6 +1996,412 @@ const ClientLogin = () => {
   );
 };
 
+// Dashboard del Cliente
+const ClientDashboard = () => {
+  const { user } = useAuth();
+  const [stats, setStats] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchStats();
+  }, []);
+
+  const fetchStats = async () => {
+    try {
+      const response = await axios.get(`${API}/dashboard/stats`);
+      setStats(response.data);
+    } catch (error) {
+      console.error('Error fetching stats:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-white shadow">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center py-6">
+            <div className="flex items-center">
+              <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+              </div>
+              <h1 className="ml-3 text-2xl font-bold text-gray-900">Dashboard del Cliente</h1>
+            </div>
+            
+            <div className="flex items-center space-x-4">
+              <Link
+                to="/client-profile"
+                className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium"
+                data-testid="client-profile-link"
+              >
+                Mi Perfil
+              </Link>
+              <Link
+                to="/"
+                className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700"
+                data-testid="client-home-link"
+              >
+                Buscar Lavaderos
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Welcome Section */}
+        <div className="mb-8">
+          <h2 className="text-3xl font-bold text-gray-900" data-testid="client-welcome">
+            ¡Bienvenido, {user?.nombre}!
+          </h2>
+          <p className="mt-1 text-sm text-gray-600">
+            Gestiona tus reservas y encuentra los mejores lavaderos
+          </p>
+        </div>
+
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="bg-white overflow-hidden shadow rounded-lg" data-testid="total-turnos-stat">
+            <div className="p-5">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <svg className="h-6 w-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <div className="ml-5 w-0 flex-1">
+                  <dl>
+                    <dt className="text-sm font-medium text-gray-500 truncate">Total de Turnos</dt>
+                    <dd className="text-lg font-medium text-gray-900">{stats?.mis_turnos || 0}</dd>
+                  </dl>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white overflow-hidden shadow rounded-lg" data-testid="confirmados-stat">
+            <div className="p-5">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <svg className="h-6 w-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <div className="ml-5 w-0 flex-1">
+                  <dl>
+                    <dt className="text-sm font-medium text-gray-500 truncate">Confirmados</dt>
+                    <dd className="text-lg font-medium text-gray-900">{stats?.turnos_confirmados || 0}</dd>
+                  </dl>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white overflow-hidden shadow rounded-lg" data-testid="pendientes-stat">
+            <div className="p-5">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <svg className="h-6 w-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <div className="ml-5 w-0 flex-1">
+                  <dl>
+                    <dt className="text-sm font-medium text-gray-500 truncate">Pendientes</dt>
+                    <dd className="text-lg font-medium text-gray-900">{stats?.turnos_pendientes || 0}</dd>
+                  </dl>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Quick Actions */}
+        <div className="bg-white shadow rounded-lg mb-8">
+          <div className="px-4 py-5 sm:p-6">
+            <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">Acciones Rápidas</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <Link
+                to="/"
+                className="relative group bg-gradient-to-r from-blue-500 to-blue-600 p-6 rounded-lg text-white hover:from-blue-600 hover:to-blue-700 transition-colors"
+                data-testid="search-lavaderos-action"
+              >
+                <div>
+                  <span className="rounded-lg inline-flex p-3 bg-blue-800 bg-opacity-50">
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                  </span>
+                </div>
+                <div className="mt-4">
+                  <h3 className="text-lg font-medium">Buscar Lavaderos</h3>
+                  <p className="mt-2 text-sm opacity-90">
+                    Encuentra lavaderos cerca de ti
+                  </p>
+                </div>
+              </Link>
+
+              <div className="relative group bg-gradient-to-r from-gray-400 to-gray-500 p-6 rounded-lg text-white">
+                <div>
+                  <span className="rounded-lg inline-flex p-3 bg-gray-600 bg-opacity-50">
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 002 2z" />
+                    </svg>
+                  </span>
+                </div>
+                <div className="mt-4">
+                  <h3 className="text-lg font-medium">Mis Reservas</h3>
+                  <p className="mt-2 text-sm opacity-90">
+                    Próximamente disponible
+                  </p>
+                </div>
+              </div>
+
+              <div className="relative group bg-gradient-to-r from-gray-400 to-gray-500 p-6 rounded-lg text-white">
+                <div>
+                  <span className="rounded-lg inline-flex p-3 bg-gray-600 bg-opacity-50">
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </span>
+                </div>
+                <div className="mt-4">
+                  <h3 className="text-lg font-medium">Historial</h3>
+                  <p className="mt-2 text-sm opacity-90">
+                    Próximamente disponible
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Recent Activity */}
+        <div className="bg-white shadow rounded-lg">
+          <div className="px-4 py-5 sm:p-6">
+            <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">Actividad Reciente</h3>
+            <div className="text-center py-8">
+              <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 002 2z" />
+              </svg>
+              <h4 className="mt-2 text-lg font-medium text-gray-900">No hay actividad reciente</h4>
+              <p className="mt-1 text-sm text-gray-600">
+                Cuando realices reservas aparecerán aquí.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Perfil del Cliente
+const ClientProfile = () => {
+  const { user, logout } = useAuth();
+  const [editing, setEditing] = useState(false);
+  const [formData, setFormData] = useState({
+    nombre: user?.nombre || '',
+    email: user?.email || ''
+  });
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState('');
+  const navigate = useNavigate();
+
+  const handleChange = (e) => {
+    setFormData(prev => ({
+      ...prev,
+      [e.target.name]: e.target.value
+    }));
+  };
+
+  const handleSave = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setMessage('');
+    
+    try {
+      // Simular guardado (implementar endpoint cuando esté disponible)
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      setMessage('Perfil actualizado correctamente');
+      setEditing(false);
+    } catch (error) {
+      setMessage('Error al actualizar el perfil');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    await logout();
+    navigate('/');
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-white shadow">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center py-6">
+            <div className="flex items-center">
+              <Link to="/client-dashboard" className="mr-4">
+                <svg className="w-6 h-6 text-gray-600 hover:text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
+                </svg>
+              </Link>
+              <h1 className="text-2xl font-bold text-gray-900">Mi Perfil</h1>
+            </div>
+            
+            <button
+              onClick={handleLogout}
+              className="text-gray-700 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium"
+              data-testid="client-logout-btn"
+            >
+              Cerrar Sesión
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="bg-white shadow rounded-lg">
+          <div className="px-4 py-5 sm:p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-lg leading-6 font-medium text-gray-900">
+                Información Personal
+              </h3>
+              {!editing && (
+                <button
+                  onClick={() => setEditing(true)}
+                  className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700"
+                  data-testid="edit-profile-btn"
+                >
+                  Editar
+                </button>
+              )}
+            </div>
+
+            {message && (
+              <div className={`mb-4 p-4 rounded-md ${
+                message.includes('Error') 
+                  ? 'bg-red-50 border border-red-200 text-red-600'
+                  : 'bg-green-50 border border-green-200 text-green-600'
+              }`}>
+                {message}
+              </div>
+            )}
+
+            <form onSubmit={handleSave}>
+              <div className="grid grid-cols-1 gap-6">
+                <div>
+                  <label htmlFor="nombre" className="block text-sm font-medium text-gray-700">
+                    Nombre completo
+                  </label>
+                  <div className="mt-1">
+                    <input
+                      type="text"
+                      name="nombre"
+                      id="nombre"
+                      disabled={!editing}
+                      value={formData.nombre}
+                      onChange={handleChange}
+                      data-testid="profile-nombre"
+                      className={`shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md ${
+                        !editing ? 'bg-gray-50 cursor-not-allowed' : ''
+                      }`}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                    Email
+                  </label>
+                  <div className="mt-1">
+                    <input
+                      type="email"
+                      name="email"
+                      id="email"
+                      disabled={!editing}
+                      value={formData.email}
+                      onChange={handleChange}
+                      data-testid="profile-email"
+                      className={`shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md ${
+                        !editing ? 'bg-gray-50 cursor-not-allowed' : ''
+                      }`}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Rol
+                  </label>
+                  <div className="mt-1">
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                      Cliente
+                    </span>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Miembro desde
+                  </label>
+                  <div className="mt-1 text-sm text-gray-600">
+                    {user?.created_at ? new Date(user.created_at).toLocaleDateString() : 'No disponible'}
+                  </div>
+                </div>
+              </div>
+
+              {editing && (
+                <div className="mt-6 flex justify-end space-x-3">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEditing(false);
+                      setFormData({
+                        nombre: user?.nombre || '',
+                        email: user?.email || ''
+                      });
+                    }}
+                    className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                    data-testid="cancel-edit-btn"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    data-testid="save-profile-btn"
+                    className="bg-blue-600 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+                  >
+                    {loading ? 'Guardando...' : 'Guardar'}
+                  </button>
+                </div>
+              )}
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // Página de Inicio (Dual)
 const HomePage = () => {
   const [lavaderos, setLavaderos] = useState([]);
