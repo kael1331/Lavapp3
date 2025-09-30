@@ -2476,6 +2476,15 @@ const CalendarioSemanal = ({
   onDateSelect, 
   onTimeSelect 
 }) => {
+  // Debug: Mostrar configuración recibida
+  useEffect(() => {
+    console.log('📅 Configuración del calendario:', {
+      horario_apertura: configuracion?.horario_apertura,
+      horario_cierre: configuracion?.horario_cierre,
+      duracion_turno: configuracion?.duracion_turno,
+      dias_laborables: configuracion?.dias_laborables
+    });
+  }, [configuracion]);
   const [currentWeekStart, setCurrentWeekStart] = useState(() => {
     // Obtener el inicio de la semana actual (lunes)
     const today = new Date();
