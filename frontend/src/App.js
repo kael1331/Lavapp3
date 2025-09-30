@@ -1824,7 +1824,7 @@ const ClientLogin = () => {
       if (result.success) {
         // Verificar que sea un cliente
         if (result.user.rol === 'CLIENTE') {
-          navigate('/client-dashboard');
+          navigate('/'); // Redirigir al home en lugar del dashboard
         } else {
           setErrors({
             general: 'Esta página es solo para clientes. Si eres administrador, usa el login de administradores.'
