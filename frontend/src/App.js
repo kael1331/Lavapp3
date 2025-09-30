@@ -2487,8 +2487,22 @@ const HomePage = () => {
               <span className="ml-3 text-sm text-gray-500">Sistema de Gestión de Lavaderos</span>
             </div>
             
-            {/* Sección mínima para administradores */}
+            {/* Sección para usuarios */}
             <div className="flex items-center space-x-4">
+              <Link 
+                to="/client-login" 
+                className="text-sm bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition-colors"
+                data-testid="client-login-header-btn"
+              >
+                👤 Iniciar Sesión
+              </Link>
+              <Link 
+                to="/client-register" 
+                className="text-sm bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md transition-colors"
+                data-testid="client-register-header-btn"
+              >
+                📝 Registrarse
+              </Link>
               <Link 
                 to="/admin-login" 
                 className="text-sm bg-gray-800 hover:bg-gray-900 text-white px-4 py-2 rounded-md transition-colors"
