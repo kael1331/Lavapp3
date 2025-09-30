@@ -198,6 +198,7 @@ class ConfiguracionLavadero(BaseModel):
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class ConfiguracionLavaderoCreate(BaseModel):
+    nombre_lavadero: Optional[str] = None
     hora_apertura: str
     hora_cierre: str
     duracion_turno_minutos: int
