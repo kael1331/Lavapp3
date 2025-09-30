@@ -2035,6 +2035,13 @@ async def update_configuracion_lavadero(config_data: ConfiguracionLavaderoCreate
         update_data
     )
     
+    # Si se proporciona nombre_lavadero, actualizar también en la tabla lavaderos
+    if config_data.nombre_lavadero:
+        await db.lavaderos.update_one(
+            {"id": lavadero_doc["id"]},
+            {"$set": {"nombre": config_data.nombre_lavadero}}
+        )
+    
     if result.modified_count == 0:
         # Si no existe configuración, crear nueva
         nueva_config = ConfiguracionLavadero(
