@@ -2939,11 +2939,33 @@ const ReservaLavadero = () => {
                 <span className="text-gray-600">Tipo de vehículo:</span>
                 <span className="font-medium">{selectedVehiculo}</span>
               </div>
+              {selectedDate && selectedTime && (
+                <>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Fecha:</span>
+                    <span className="font-medium">{selectedDate.toLocaleDateString('es-ES', { 
+                      weekday: 'long', 
+                      year: 'numeric', 
+                      month: 'long', 
+                      day: 'numeric' 
+                    })}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Hora:</span>
+                    <span className="font-medium">{selectedTime}</span>
+                  </div>
+                </>
+              )}
               <div className="flex justify-between">
                 <span className="text-gray-600">Precio:</span>
                 <span className="font-bold text-blue-600">${precioSeleccionado.toLocaleString()}</span>
               </div>
-              {/* TODO: Agregar fecha y hora seleccionada */}
+              {configuracionLavadero?.alias_bancario && (
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Alias para pago:</span>
+                  <span className="font-mono text-sm bg-gray-100 px-2 py-1 rounded">{configuracionLavadero.alias_bancario}</span>
+                </div>
+              )}
             </div>
 
             <div className="border-t pt-4">
