@@ -4,7 +4,7 @@ import json
 from datetime import datetime
 
 class AuthenticationAPITester:
-    def __init__(self, base_url="https://carwashman.preview.emergentagent.com/api"):
+    def __init__(self, base_url="https://lavadero-system.preview.emergentagent.com/api"):
         self.base_url = base_url
         self.admin_token = None
         self.employee_token = None
@@ -714,7 +714,7 @@ class AuthenticationAPITester:
                         imagen_url = response_data.get('imagen_url')
                         if imagen_url:
                             print("\n   Testing image URL accessibility...")
-                            image_full_url = f"https://laundry-mgmt-1.preview.emergentagent.com{imagen_url}"
+                            image_full_url = f"https://lavadero-system.preview.emergentagent.com{imagen_url}"
                             
                             try:
                                 img_response = requests.get(image_full_url)
@@ -945,7 +945,7 @@ class AuthenticationAPITester:
                     print("✅ URL format correct")
                     
                     # Test if the full URL would work
-                    full_url = f"https://laundry-mgmt-1.preview.emergentagent.com/api{imagen_url}"
+                    full_url = f"https://lavadero-system.preview.emergentagent.com/api{imagen_url}"
                     print(f"   Full URL would be: {full_url}")
                     
                     # Extract filename and test direct access
@@ -978,7 +978,7 @@ class AuthenticationAPITester:
         # Step 5: Test frontend URL construction pattern
         print("\n5️⃣ Testing frontend URL construction pattern...")
         print("   Frontend should use: ${API}${comprobante.imagen_url}")
-        print("   Where API = 'https://laundry-mgmt-1.preview.emergentagent.com/api'")
+        print("   Where API = 'https://lavadero-system.preview.emergentagent.com/api'")
         
         if results['comprobantes_pendientes_works'] and len(comprobantes_data) > 0:
             sample_comprobante = comprobantes_data[0]
@@ -986,7 +986,7 @@ class AuthenticationAPITester:
             
             if imagen_url:
                 # Simulate frontend URL construction
-                api_base = "https://laundry-mgmt-1.preview.emergentagent.com/api"
+                api_base = "https://lavadero-system.preview.emergentagent.com/api"
                 constructed_url = f"{api_base}{imagen_url}"
                 print(f"   Sample constructed URL: {constructed_url}")
                 

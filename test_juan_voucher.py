@@ -6,7 +6,7 @@ import requests
 import json
 
 def test_juan_voucher():
-    base_url = "https://laundry-mgmt-1.preview.emergentagent.com/api"
+    base_url = "https://lavadero-system.preview.emergentagent.com/api"
     
     print("🧪 TESTING JUAN'S VOUCHER FUNCTIONALITY")
     print("=" * 45)

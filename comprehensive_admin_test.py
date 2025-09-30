@@ -3,7 +3,7 @@ import json
 
 def comprehensive_admin_testing():
     """Comprehensive test for admin login fixes and credential system improvements"""
-    base_url = "https://laundry-mgmt-1.preview.emergentagent.com/api"
+    base_url = "https://lavadero-system.preview.emergentagent.com/api"
     
     print("🔐 COMPREHENSIVE ADMIN SYSTEM TESTING")
     print("=" * 60)

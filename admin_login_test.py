@@ -3,7 +3,7 @@ import json
 
 def test_admin_login_with_real_credentials():
     """Test admin login using credentials from credenciales-testing endpoint"""
-    base_url = "https://laundry-mgmt-1.preview.emergentagent.com/api"
+    base_url = "https://lavadero-system.preview.emergentagent.com/api"
     
     print("🔐 TESTING ADMIN LOGIN WITH REAL CREDENTIALS")
     print("=" * 60)

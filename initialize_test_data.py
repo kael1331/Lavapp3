@@ -229,9 +229,9 @@ async def main():
         print("   cliente3@gmail.com - cliente123")
         
         print("\n🌐 URLs de acceso:")
-        print("   Frontend: https://carwashman.preview.emergentagent.com/")
-        print("   Admin Login: https://carwashman.preview.emergentagent.com/admin-login")
-        print("   Super Admin: https://carwashman.preview.emergentagent.com/superadmin-dashboard")
+        print("   Frontend: https://lavadero-system.preview.emergentagent.com/")
+        print("   Admin Login: https://lavadero-system.preview.emergentagent.com/admin-login")
+        print("   Super Admin: https://lavadero-system.preview.emergentagent.com/superadmin-dashboard")
         
     except Exception as e:
         print(f"❌ Error durante la inicialización: {e}")
