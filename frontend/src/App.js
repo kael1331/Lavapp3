@@ -2531,7 +2531,9 @@ const CalendarioSemanal = ({
   // Verificar si un día es laborable
   const isDayWorking = (date) => {
     const dayOfWeek = date.getDay(); // 0 = domingo, 1 = lunes, etc.
-    return configuracion.dias_laborables.includes(dayOfWeek === 0 ? 7 : dayOfWeek);
+    // Convertir de JavaScript (0=dom, 1=lun...) a backend (1=lun, 2=mar..., 7=dom)
+    const backendDayOfWeek = dayOfWeek === 0 ? 7 : dayOfWeek;
+    return configuracion.dias_laborables && configuracion.dias_laborables.includes(backendDayOfWeek);
   };
 
   // Verificar si una fecha es pasada
