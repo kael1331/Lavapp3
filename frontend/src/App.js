@@ -1584,10 +1584,30 @@ const ClientRegister = () => {
       });
       
       if (result.success) {
-        setSuccess(true);
-        setTimeout(() => {
-          navigate('/client-login');
-        }, 2000);
+        // Verificar si viene de una selección de lavadero
+        const fromLavaderoSelection = sessionStorage.getItem('from_lavadero_selection');
+        
+        if (fromLavaderoSelection) {
+          // Hacer login automático y redirigir a reserva
+          try {
+            const loginResult = await login(formData.email, formData.password);
+            if (loginResult.success) {
+              const selectedLavaderoId = sessionStorage.getItem('selected_lavadero_id');
+              sessionStorage.removeItem('selected_lavadero_id');
+              sessionStorage.removeItem('from_lavadero_selection');
+              navigate(`/lavadero/${selectedLavaderoId}/reservar`);
+            }
+          } catch (error) {
+            // Si falla el login automático, redirigir al login manual
+            navigate('/client-login');
+          }
+        } else {
+          // Flujo normal de registro
+          setSuccess(true);
+          setTimeout(() => {
+            navigate('/client-login');
+          }, 2000);
+        }
       }
     } catch (error) {
       setErrors({
