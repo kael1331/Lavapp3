@@ -2673,16 +2673,12 @@ const HomePage = () => {
                       </p>
                     )}
                     
-                    <Link
-                      to={`/lavadero/${lavadero.id}/login`}
-                      className={`w-full font-medium py-2 px-4 rounded-md transition-colors text-center block ${
-                        lavadero.estado_apertura === 'Abierto'
-                          ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                          : 'bg-gray-300 text-gray-500 cursor-not-allowed pointer-events-none'
-                      }`}
+                    <button
+                      onClick={() => handleLavaderoSelection(lavadero)}
+                      className="w-full font-medium py-2 px-4 rounded-md transition-colors text-center bg-blue-600 hover:bg-blue-700 text-white"
                     >
-                      {lavadero.estado_apertura === 'Abierto' ? 'Seleccionar Lavadero' : 'Cerrado'}
-                    </Link>
+                      Seleccionar Lavadero
+                    </button>
                   </div>
                 </div>
               ))}
