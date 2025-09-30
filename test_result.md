@@ -279,6 +279,18 @@ backend:
         agent: "testing"
         comment: "❌ PROBLEMA CRÍTICO IDENTIFICADO EN CONFIGURACIONES DE LAVADEROS - Verificación completa realizada según review request: ✅ CREDENCIALES FUNCIONAN: Ana (kael1@lavadero.com/kael1331) y Carlos (kael4@lavadero.com/kael1331) login exitoso, ✅ CONFIGURACIONES OBTENIDAS: Ambos lavaderos tienen configuraciones diferentes que explican el problema del calendario. DIFERENCIAS CRÍTICAS ENCONTRADAS: 1) HORARIO APERTURA: Ana=08:00 vs Carlos=14:00, 2) DURACIÓN TURNO: Ana=60min vs Carlos=90min, 3) ALIAS BANCARIO: Ana='lavadero.alias.mp' vs Carlos='lavadero.alias.mp.actualizado'. ❌ DISCREPANCIA GRAVE: Los endpoints /admin/configuracion muestran configuraciones diferentes a /lavaderos/{id}/configuracion - Ana admin dice 08:00-18:00 pero público dice 08:00-20:00, Carlos admin dice 14:00-18:00 pero público dice 08:00-20:00. CAUSA RAÍZ: El sistema no sincroniza correctamente las configuraciones entre admin y público, causando que el calendario use configuraciones incorrectas. DÍAS NO LABORALES: Ambos lavaderos tienen 0 días no laborales. RECOMENDACIÓN URGENTE: Corregir la sincronización entre configuraciones admin y públicas, el frontend debe usar GET /lavaderos/{id}/configuracion específico para cada lavadero."
 
+  - task: "Probar correcciones implementadas en el sistema de configuración de lavaderos"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "🎉 CONFIGURACIÓN SINCRONIZADA EXITOSAMENTE - Probadas las correcciones implementadas según review request: ✅ PASO 1: Login como Carlos (kael4@lavadero.com/kael1331) exitoso, ✅ PASO 2: GET /api/admin/configuracion obtuvo configuración actual (14:00-18:00, 90min), ✅ PASO 3: PUT /api/admin/configuracion forzó actualización con mismos valores exitosamente, ✅ PASO 4: GET /api/lavaderos/{id}/configuracion ahora muestra valores sincronizados correctamente, ✅ PASO 5: Nuevo endpoint /api/lavaderos/{id}/dias-no-laborales funciona perfectamente (devuelve lista vacía como esperado), ✅ PASO 6: Comparación de configuraciones ANTES Y DESPUÉS confirma sincronización: Horarios Admin=14:00-18:00 | Public=14:00-18:00 ✓, Duración Admin=90min | Public=90min ✓, Alias bancario sincronizado ✓. ✅ EXPECTATIVA CUMPLIDA: El endpoint público ahora muestra exactamente la configuración que estableció el admin (horarios 14:00-18:00, duración 90min para Carlos). RESULTADO: 6/6 pruebas exitosas (100% success rate). Las correcciones funcionan perfectamente."
+
 frontend:
   - task: "Modificar botón toggle para activar/desactivar lavaderos"
     implemented: true
