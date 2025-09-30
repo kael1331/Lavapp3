@@ -1960,7 +1960,9 @@ async def get_configuracion_lavadero(request: Request):
         )
         config_dict = default_config.dict()
         await db.configuracion_lavadero.insert_one(config_dict)
-        return default_config.dict()
+        config_response = default_config.dict()
+        config_response['nombre_lavadero'] = lavadero_doc.get("nombre", "")
+        return config_response
     
     # Remove MongoDB ObjectId from the document
     config_dict = dict(config_doc)
