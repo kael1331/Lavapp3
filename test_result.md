@@ -267,6 +267,18 @@ backend:
         agent: "testing"
         comment: "🎉 NUEVA FUNCIONALIDAD DE ALIAS BANCARIO COMPLETAMENTE FUNCIONAL Y VERIFICADA - Probé exhaustivamente la nueva funcionalidad según especificaciones del review request: ✅ PRUEBA 1: Login como admin con pago pendiente (juan@lavaderonorte.com/juan123) exitoso, ✅ PRUEBA 2: GET /admin/pago-pendiente ahora incluye el nuevo campo 'alias_bancario_superadmin' correctamente, ✅ PRUEBA 3: El alias devuelto ('Adenda.reto.corte') coincide perfectamente con la configuración del Super Admin obtenida de GET /superadmin/configuracion, ✅ PRUEBA 4: Toda la funcionalidad existente se mantiene intacta (tiene_pago_pendiente, pago_id, monto, mes_año, fecha_vencimiento, tiene_comprobante, estado_comprobante), ✅ PRUEBA 5: Integración frontend lista - todos los datos necesarios presentes para mostrar 'Datos para la Transferencia' con monto ($5000.0) y alias bancario. SETUP REALIZADO: Creé pago pendiente para Juan usando toggle lavadero para testing completo. RESULTADO: 5/5 pruebas exitosas (100% success rate). La nueva funcionalidad permite a los administradores ver exactamente dónde realizar la transferencia, cumpliendo completamente el objetivo del review request."
 
+  - task: "Verificar configuraciones específicas de lavaderos para entender problemas del sistema de reservas"
+    implemented: true
+    working: false
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: "❌ PROBLEMA CRÍTICO IDENTIFICADO EN CONFIGURACIONES DE LAVADEROS - Verificación completa realizada según review request: ✅ CREDENCIALES FUNCIONAN: Ana (kael1@lavadero.com/kael1331) y Carlos (kael4@lavadero.com/kael1331) login exitoso, ✅ CONFIGURACIONES OBTENIDAS: Ambos lavaderos tienen configuraciones diferentes que explican el problema del calendario. DIFERENCIAS CRÍTICAS ENCONTRADAS: 1) HORARIO APERTURA: Ana=08:00 vs Carlos=14:00, 2) DURACIÓN TURNO: Ana=60min vs Carlos=90min, 3) ALIAS BANCARIO: Ana='lavadero.alias.mp' vs Carlos='lavadero.alias.mp.actualizado'. ❌ DISCREPANCIA GRAVE: Los endpoints /admin/configuracion muestran configuraciones diferentes a /lavaderos/{id}/configuracion - Ana admin dice 08:00-18:00 pero público dice 08:00-20:00, Carlos admin dice 14:00-18:00 pero público dice 08:00-20:00. CAUSA RAÍZ: El sistema no sincroniza correctamente las configuraciones entre admin y público, causando que el calendario use configuraciones incorrectas. DÍAS NO LABORALES: Ambos lavaderos tienen 0 días no laborales. RECOMENDACIÓN URGENTE: Corregir la sincronización entre configuraciones admin y públicas, el frontend debe usar GET /lavaderos/{id}/configuracion específico para cada lavadero."
+
 frontend:
   - task: "Modificar botón toggle para activar/desactivar lavaderos"
     implemented: true
