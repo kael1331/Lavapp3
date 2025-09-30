@@ -2642,11 +2642,19 @@ const ReservaLavadero = () => {
         <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
           <h3 className="text-xl font-bold text-gray-900 mb-4">📅 Seleccionar Fecha y Hora</h3>
           
-          <div className="text-center py-12 text-gray-500">
-            <div className="text-6xl mb-4">🚧</div>
-            <h4 className="text-lg font-medium mb-2">Vista Semanal en Desarrollo</h4>
-            <p className="mb-4">Próximamente: Vista semanal con slots de tiempo disponibles</p>
-          </div>
+          <CalendarioSemanal 
+            lavadero={lavadero}
+            configuracion={{
+              horario_apertura: "08:00",
+              horario_cierre: "20:00", 
+              duracion_turno: 60,
+              dias_laborables: [1, 2, 3, 4, 5, 6] // Lunes a Sábado
+            }}
+            selectedDate={selectedDate}
+            selectedTime={selectedTime}
+            onDateSelect={setSelectedDate}
+            onTimeSelect={setSelectedTime}
+          />
         </div>
 
         {/* Resumen y Confirmación */}
