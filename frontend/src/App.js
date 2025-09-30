@@ -176,7 +176,7 @@ const AuthProvider = ({ children }) => {
       axios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
       setUser(userData);
       
-      return { success: true };
+      return { success: true, user: userData };
     } catch (error) {
       return { 
         success: false, 
