@@ -3511,5 +3511,321 @@ def main():
         print("⚠️  Some tests failed!")
         return 1
 
+    # ========== SPECIFIC TASK: TEST LAVADERO CONFIGURATION SYNCHRONIZATION ==========
+    
+    def test_lavadero_configuration_synchronization(self):
+        """
+        SPECIFIC TASK: Test lavadero configuration synchronization between admin and public endpoints
+        
+        Requirements from review request:
+        1. Login as Carlos (kael4@lavadero.com/kael1331) 
+        2. GET /api/admin/configuracion to see current configuration
+        3. Force update with PUT /api/admin/configuracion using the same values
+        4. Verify that GET /api/lavaderos/{id}/configuracion now shows synchronized values
+        5. Test new endpoint /api/lavaderos/{id}/dias-no-laborales
+        6. Compare configurations before and after
+        7. Confirm that duracion_turno synchronizes correctly
+        
+        EXPECTATION: After correction, public endpoint should show exactly the configuration 
+        that admin set (schedules 14:00-18:00, duration 90min for Carlos).
+        
+        CARLOS LAVADERO ID: b9dbbedf-2435-471f-abd6-407edf64d2e3
+        """
+        print("\n🎯 TESTING LAVADERO CONFIGURATION SYNCHRONIZATION...")
+        print("=" * 70)
+        
+        results = {
+            'carlos_login': False,
+            'admin_config_retrieved': False,
+            'admin_config_updated': False,
+            'public_config_retrieved': False,
+            'dias_no_laborales_endpoint_works': False,
+            'configurations_synchronized': False,
+            'duracion_turno_synchronized': False,
+            'horarios_synchronized': False,
+            'admin_config_before': None,
+            'admin_config_after': None,
+            'public_config_after': None,
+            'dias_no_laborales': None
+        }
+        
+        carlos_lavadero_id = "b9dbbedf-2435-471f-abd6-407edf64d2e3"
+        
+        # Step 1: Login as Carlos (kael4@lavadero.com/kael1331)
+        print("\n1️⃣ Login as Carlos (kael4@lavadero.com/kael1331)...")
+        
+        carlos_login_success, carlos_token, carlos_user = self.test_login(
+            "kael4@lavadero.com", "kael1331", "Carlos (Lavadero Express)"
+        )
+        
+        if not carlos_login_success or not carlos_token:
+            print("❌ Carlos login failed - cannot test configuration synchronization")
+            return results
+        
+        results['carlos_login'] = True
+        print("✅ Carlos login successful")
+        print(f"   User: {carlos_user.get('nombre')} ({carlos_user.get('email')})")
+        
+        # Step 2: GET /api/admin/configuracion to see current configuration
+        print("\n2️⃣ Getting current admin configuration...")
+        
+        admin_config_success, admin_config_data = self.run_test(
+            "Get Admin Configuration (Carlos)",
+            "GET",
+            "admin/configuracion",
+            200,
+            token=carlos_token
+        )
+        
+        if admin_config_success and isinstance(admin_config_data, dict):
+            results['admin_config_retrieved'] = True
+            results['admin_config_before'] = admin_config_data
+            print("✅ Admin configuration retrieved successfully")
+            print(f"   Hora apertura: {admin_config_data.get('hora_apertura')}")
+            print(f"   Hora cierre: {admin_config_data.get('hora_cierre')}")
+            print(f"   Duración turno: {admin_config_data.get('duracion_turno_minutos')} minutos")
+            print(f"   Alias bancario: {admin_config_data.get('alias_bancario')}")
+            print(f"   Precio turno: ${admin_config_data.get('precio_turno')}")
+        else:
+            print("❌ Failed to get admin configuration")
+            return results
+        
+        # Step 3: Force update with PUT /api/admin/configuracion using the same values
+        print("\n3️⃣ Force updating admin configuration with same values...")
+        
+        # Use the current values to force an update
+        update_config_data = {
+            "hora_apertura": admin_config_data.get('hora_apertura', '14:00'),
+            "hora_cierre": admin_config_data.get('hora_cierre', '18:00'),
+            "duracion_turno_minutos": admin_config_data.get('duracion_turno_minutos', 90),
+            "dias_laborales": admin_config_data.get('dias_laborales', [1, 2, 3, 4, 5, 6]),
+            "alias_bancario": admin_config_data.get('alias_bancario', 'lavadero.alias.mp.actualizado'),
+            "precio_turno": admin_config_data.get('precio_turno', 5000.0)
+        }
+        
+        print(f"   Updating with values:")
+        print(f"   • Hora apertura: {update_config_data['hora_apertura']}")
+        print(f"   • Hora cierre: {update_config_data['hora_cierre']}")
+        print(f"   • Duración turno: {update_config_data['duracion_turno_minutos']} minutos")
+        print(f"   • Alias bancario: {update_config_data['alias_bancario']}")
+        print(f"   • Precio turno: ${update_config_data['precio_turno']}")
+        
+        update_success, update_response = self.run_test(
+            "Force Update Admin Configuration (Carlos)",
+            "PUT",
+            "admin/configuracion",
+            200,
+            data=update_config_data,
+            token=carlos_token
+        )
+        
+        if update_success:
+            results['admin_config_updated'] = True
+            print("✅ Admin configuration updated successfully")
+            print(f"   Response: {update_response.get('message', 'No message')}")
+        else:
+            print("❌ Failed to update admin configuration")
+            return results
+        
+        # Step 4: Get admin configuration again to verify update
+        print("\n4️⃣ Getting admin configuration after update...")
+        
+        admin_config_after_success, admin_config_after_data = self.run_test(
+            "Get Admin Configuration After Update (Carlos)",
+            "GET",
+            "admin/configuracion",
+            200,
+            token=carlos_token
+        )
+        
+        if admin_config_after_success and isinstance(admin_config_after_data, dict):
+            results['admin_config_after'] = admin_config_after_data
+            print("✅ Admin configuration retrieved after update")
+            print(f"   Hora apertura: {admin_config_after_data.get('hora_apertura')}")
+            print(f"   Hora cierre: {admin_config_after_data.get('hora_cierre')}")
+            print(f"   Duración turno: {admin_config_after_data.get('duracion_turno_minutos')} minutos")
+        else:
+            print("❌ Failed to get admin configuration after update")
+        
+        # Step 5: GET /api/lavaderos/{id}/configuracion to verify synchronization
+        print(f"\n5️⃣ Getting public configuration for lavadero {carlos_lavadero_id}...")
+        
+        public_config_success, public_config_data = self.run_test(
+            f"Get Public Configuration (Lavadero {carlos_lavadero_id})",
+            "GET",
+            f"lavaderos/{carlos_lavadero_id}/configuracion",
+            200
+        )
+        
+        if public_config_success and isinstance(public_config_data, dict):
+            results['public_config_retrieved'] = True
+            results['public_config_after'] = public_config_data
+            print("✅ Public configuration retrieved successfully")
+            print(f"   Horario apertura: {public_config_data.get('horario_apertura')}")
+            print(f"   Horario cierre: {public_config_data.get('horario_cierre')}")
+            print(f"   Duración turno: {public_config_data.get('duracion_turno')} minutos")
+            print(f"   Alias bancario: {public_config_data.get('alias_bancario')}")
+            print(f"   Esta abierto: {public_config_data.get('esta_abierto')}")
+        else:
+            print("❌ Failed to get public configuration")
+            return results
+        
+        # Step 6: Test new endpoint /api/lavaderos/{id}/dias-no-laborales
+        print(f"\n6️⃣ Testing new endpoint /api/lavaderos/{carlos_lavadero_id}/dias-no-laborales...")
+        
+        dias_no_laborales_success, dias_no_laborales_data = self.run_test(
+            f"Get Días No Laborales (Lavadero {carlos_lavadero_id})",
+            "GET",
+            f"lavaderos/{carlos_lavadero_id}/dias-no-laborales",
+            200
+        )
+        
+        if dias_no_laborales_success and isinstance(dias_no_laborales_data, list):
+            results['dias_no_laborales_endpoint_works'] = True
+            results['dias_no_laborales'] = dias_no_laborales_data
+            print("✅ Días no laborales endpoint working")
+            print(f"   Found {len(dias_no_laborales_data)} días no laborales")
+            
+            if len(dias_no_laborales_data) == 0:
+                print("   ✅ Returns empty list as expected (no holidays configured)")
+            else:
+                print("   Días no laborales found:")
+                for dia in dias_no_laborales_data[:3]:  # Show first 3
+                    print(f"   • {dia.get('fecha')} - {dia.get('motivo', 'Sin motivo')}")
+        else:
+            print("❌ Días no laborales endpoint failed")
+        
+        # Step 7: Compare configurations and verify synchronization
+        print("\n7️⃣ Comparing configurations and verifying synchronization...")
+        
+        if results['admin_config_after'] and results['public_config_after']:
+            admin_config = results['admin_config_after']
+            public_config = results['public_config_after']
+            
+            print("\n   CONFIGURATION COMPARISON:")
+            print("   " + "="*50)
+            
+            # Compare horarios (admin uses hora_apertura/hora_cierre, public uses horario_apertura/horario_cierre)
+            admin_apertura = admin_config.get('hora_apertura')
+            admin_cierre = admin_config.get('hora_cierre')
+            public_apertura = public_config.get('horario_apertura')
+            public_cierre = public_config.get('horario_cierre')
+            
+            print(f"   Horario apertura: Admin={admin_apertura} | Public={public_apertura}")
+            print(f"   Horario cierre:   Admin={admin_cierre} | Public={public_cierre}")
+            
+            if admin_apertura == public_apertura and admin_cierre == public_cierre:
+                results['horarios_synchronized'] = True
+                print("   ✅ Horarios synchronized correctly")
+            else:
+                print("   ❌ Horarios NOT synchronized")
+            
+            # Compare duración turno (admin uses duracion_turno_minutos, public uses duracion_turno)
+            admin_duracion = admin_config.get('duracion_turno_minutos')
+            public_duracion = public_config.get('duracion_turno')
+            
+            print(f"   Duración turno:   Admin={admin_duracion}min | Public={public_duracion}min")
+            
+            if admin_duracion == public_duracion:
+                results['duracion_turno_synchronized'] = True
+                print("   ✅ Duración turno synchronized correctly")
+            else:
+                print("   ❌ Duración turno NOT synchronized")
+            
+            # Compare alias bancario
+            admin_alias = admin_config.get('alias_bancario')
+            public_alias = public_config.get('alias_bancario')
+            
+            print(f"   Alias bancario:   Admin={admin_alias} | Public={public_alias}")
+            
+            if admin_alias == public_alias:
+                print("   ✅ Alias bancario synchronized correctly")
+            else:
+                print("   ❌ Alias bancario NOT synchronized")
+            
+            # Overall synchronization check
+            if results['horarios_synchronized'] and results['duracion_turno_synchronized']:
+                results['configurations_synchronized'] = True
+                print("\n   🎉 CONFIGURATIONS SUCCESSFULLY SYNCHRONIZED!")
+                print("   ✅ Admin configuration changes are reflected in public endpoint")
+            else:
+                print("\n   ❌ CONFIGURATIONS NOT FULLY SYNCHRONIZED")
+                print("   ⚠️  Some fields are not matching between admin and public endpoints")
+        
+        # Step 8: Verify expected values from review request
+        print("\n8️⃣ Verifying expected values from review request...")
+        print("   Expected for Carlos: horarios 14:00-18:00, duración 90min")
+        
+        if results['public_config_after']:
+            public_config = results['public_config_after']
+            expected_apertura = "14:00"
+            expected_cierre = "18:00"
+            expected_duracion = 90
+            
+            actual_apertura = public_config.get('horario_apertura')
+            actual_cierre = public_config.get('horario_cierre')
+            actual_duracion = public_config.get('duracion_turno')
+            
+            print(f"   Expected: {expected_apertura}-{expected_cierre}, {expected_duracion}min")
+            print(f"   Actual:   {actual_apertura}-{actual_cierre}, {actual_duracion}min")
+            
+            if (actual_apertura == expected_apertura and 
+                actual_cierre == expected_cierre and 
+                actual_duracion == expected_duracion):
+                print("   ✅ Public endpoint shows exactly the expected configuration!")
+            else:
+                print("   ⚠️  Public endpoint values don't match expected values")
+        
+        return results
+
+def run_priority_test():
+    """Run only the priority test for lavadero configuration synchronization"""
+    print("🎯 RUNNING PRIORITY TEST: LAVADERO CONFIGURATION SYNCHRONIZATION")
+    print("=" * 70)
+    
+    tester = AuthenticationAPITester()
+    
+    # Run the specific test
+    sync_results = tester.test_lavadero_configuration_synchronization()
+    
+    # Summary
+    print("\n" + "="*70)
+    print("🎯 PRIORITY TEST RESULTS - CONFIGURATION SYNCHRONIZATION")
+    print("="*70)
+    
+    if sync_results:
+        sync_status = [
+            ("Carlos Login", sync_results.get('carlos_login', False)),
+            ("Admin Config Retrieved", sync_results.get('admin_config_retrieved', False)),
+            ("Admin Config Updated", sync_results.get('admin_config_updated', False)),
+            ("Public Config Retrieved", sync_results.get('public_config_retrieved', False)),
+            ("Días No Laborales Endpoint", sync_results.get('dias_no_laborales_endpoint_works', False)),
+            ("Configurations Synchronized", sync_results.get('configurations_synchronized', False)),
+            ("Duración Turno Synchronized", sync_results.get('duracion_turno_synchronized', False)),
+            ("Horarios Synchronized", sync_results.get('horarios_synchronized', False))
+        ]
+        
+        for test_name, test_result in sync_status:
+            status = "✅" if test_result else "❌"
+            print(f"{status} {test_name}")
+        
+        if sync_results.get('configurations_synchronized', False):
+            print("\n🎉 CONFIGURATION SYNCHRONIZATION WORKING CORRECTLY!")
+        else:
+            print("\n⚠️  CONFIGURATION SYNCHRONIZATION NEEDS ATTENTION")
+    
+    print(f"\nTotal tests run: {tester.tests_run}")
+    print(f"Tests passed: {tester.tests_passed}")
+    print(f"Success rate: {(tester.tests_passed/tester.tests_run)*100:.1f}%")
+    
+    return sync_results
+
 if __name__ == "__main__":
-    sys.exit(main())
+    import sys
+    
+    if len(sys.argv) > 1 and sys.argv[1] == "priority":
+        # Run only the priority test
+        run_priority_test()
+    else:
+        # Run all tests
+        sys.exit(main())
