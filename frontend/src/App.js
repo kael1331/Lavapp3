@@ -4965,6 +4965,7 @@ const GestionAdmins = () => {
 const ConfiguracionLavadero = () => {
   const { user } = useAuth();
   const [configuracion, setConfiguracion] = useState({
+    nombre_lavadero: "",
     hora_apertura: "08:00",
     hora_cierre: "18:00",
     duracion_turno_minutos: 60,
