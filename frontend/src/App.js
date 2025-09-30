@@ -5289,6 +5289,12 @@ function App() {
                 <ClientProfile />
               </ProtectedRoute>
             } />
+            
+            <Route path="/lavadero/:id/reservar" element={
+              <ProtectedRoute requiredRole="CLIENTE">
+                <ReservaLavadero />
+              </ProtectedRoute>
+            } />
                   </Routes>
                 </div>
               </>
