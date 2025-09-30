@@ -1466,7 +1466,7 @@ async def get_all_admins(request: Request):
             "lavadero": {
                 "id": lavadero_info["id"] if lavadero_info else None,
                 "nombre": lavadero_info["nombre"] if lavadero_info else "Sin lavadero",
-                "estado_operativo": lavadero_info["estado_operativo"] if lavadero_info else "N/A",
+                "estado_operativo": lavadero_info.get("estado_operativo", "N/A") if lavadero_info else "N/A",
                 "fecha_vencimiento": lavadero_info.get("fecha_vencimiento") if lavadero_info else None
             }
         })
