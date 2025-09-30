@@ -2971,10 +2971,15 @@ const ReservaLavadero = () => {
             <div className="border-t pt-4">
               <button
                 onClick={handleConfirmarReserva}
-                disabled={!selectedVehiculo}
+                disabled={!selectedVehiculo || !selectedDate || !selectedTime}
                 className="w-full bg-blue-600 text-white py-3 px-4 rounded-md font-medium hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
               >
-                Continuar con la Reserva
+                {!selectedVehiculo 
+                  ? 'Selecciona un tipo de vehículo' 
+                  : !selectedDate || !selectedTime
+                  ? 'Selecciona fecha y hora'
+                  : 'Continuar con la Reserva'
+                }
               </button>
             </div>
           </div>
