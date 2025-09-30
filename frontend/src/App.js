@@ -2485,6 +2485,24 @@ const CalendarioSemanal = ({
       dias_laborables: configuracion?.dias_laborables
     });
   }, [configuracion]);
+
+  // Obtener días no laborales específicos del lavadero
+  useEffect(() => {
+    const fetchDiasNoLaborales = async () => {
+      if (lavadero?.id) {
+        try {
+          const response = await axios.get(`${API}/lavaderos/${lavadero.id}/dias-no-laborales`);
+          setDiasNoLaborales(response.data || []);
+          console.log('📅 Días no laborales obtenidos:', response.data);
+        } catch (error) {
+          console.error('Error fetching días no laborales:', error);
+          setDiasNoLaborales([]);
+        }
+      }
+    };
+    
+    fetchDiasNoLaborales();
+  }, [lavadero?.id]);
   const [currentWeekStart, setCurrentWeekStart] = useState(() => {
     // Obtener el inicio de la semana actual (lunes)
     const today = new Date();
