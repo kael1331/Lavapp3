@@ -2489,26 +2489,49 @@ const HomePage = () => {
             
             {/* Sección para usuarios */}
             <div className="flex items-center space-x-4">
-              <Link 
-                to="/client-login" 
-                className="text-sm bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition-colors"
-                data-testid="client-login-header-btn"
-              >
-                👤 Iniciar Sesión
-              </Link>
-              <Link 
-                to="/client-register" 
-                className="text-sm bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md transition-colors"
-                data-testid="client-register-header-btn"
-              >
-                📝 Registrarse
-              </Link>
-              <Link 
-                to="/admin-login" 
-                className="text-sm bg-gray-800 hover:bg-gray-900 text-white px-4 py-2 rounded-md transition-colors"
-              >
-                👨‍💼 Administradores
-              </Link>
+              {user && user.rol === 'CLIENTE' ? (
+                // Botones para cliente logueado
+                <>
+                  <Link 
+                    to="/client-dashboard" 
+                    className="text-sm bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition-colors"
+                    data-testid="client-dashboard-header-btn"
+                  >
+                    📊 Mi Dashboard
+                  </Link>
+                  <Link 
+                    to="/" 
+                    className="text-sm bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md transition-colors"
+                    data-testid="client-home-header-btn"
+                  >
+                    🏠 Explorar Lavaderos
+                  </Link>
+                </>
+              ) : (
+                // Botones para usuarios no logueados
+                <>
+                  <Link 
+                    to="/client-login" 
+                    className="text-sm bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition-colors"
+                    data-testid="client-login-header-btn"
+                  >
+                    👤 Iniciar Sesión
+                  </Link>
+                  <Link 
+                    to="/client-register" 
+                    className="text-sm bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md transition-colors"
+                    data-testid="client-register-header-btn"
+                  >
+                    📝 Registrarse
+                  </Link>
+                  <Link 
+                    to="/admin-login" 
+                    className="text-sm bg-gray-800 hover:bg-gray-900 text-white px-4 py-2 rounded-md transition-colors"
+                  >
+                    👨‍💼 Administradores
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         </div>
