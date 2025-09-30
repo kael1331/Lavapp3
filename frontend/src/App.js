@@ -2689,6 +2689,28 @@ const CalendarioSemanal = ({
           const isPast = isPastDate(day);
           const isToday = day.toDateString() === new Date().toDateString();
           
+          // Determinar el motivo específico por el que un día no es laborable
+          const dayOfWeek = day.getDay();
+          const backendDayOfWeek = dayOfWeek === 0 ? 7 : dayOfWeek;
+          const isDayOfWeekWorking = configuracion.dias_laborables && configuracion.dias_laborables.includes(backendDayOfWeek);
+          
+          const dateString = day.toISOString().split('T')[0];
+          const holidayInfo = diasNoLaborales.find(dia => {
+            const diaFecha = new Date(dia.fecha).toISOString().split('T')[0];
+            return diaFecha === dateString;
+          });
+          
+          let dayStatusText = '';
+          if (isToday) {
+            dayStatusText = 'Hoy';
+          } else if (isPast && isWorking) {
+            dayStatusText = 'Pasado';
+          } else if (holidayInfo) {
+            dayStatusText = holidayInfo.motivo || 'Feriado';
+          } else if (!isDayOfWeekWorking) {
+            dayStatusText = 'No laboral';
+          }
+          
           return (
             <div key={dayIndex} className="min-h-[400px]">
               {/* Header del día */}
@@ -2697,13 +2719,13 @@ const CalendarioSemanal = ({
                   ? 'bg-blue-100 border-blue-300 text-blue-900' 
                   : isWorking && !isPast
                   ? 'bg-gray-50 border-gray-200 text-gray-900'
+                  : holidayInfo
+                  ? 'bg-red-100 border-red-300 text-red-800'
                   : 'bg-gray-200 border-gray-300 text-gray-500'
               }`}>
                 <div className="font-medium text-sm">{dayNames[day.getDay()]}</div>
                 <div className="text-lg font-bold">{day.getDate()}</div>
-                {isToday && <div className="text-xs">Hoy</div>}
-                {!isWorking && <div className="text-xs">No laboral</div>}
-                {isPast && isWorking && <div className="text-xs">Pasado</div>}
+                {dayStatusText && <div className="text-xs">{dayStatusText}</div>}
               </div>
 
               {/* Slots de tiempo */}
