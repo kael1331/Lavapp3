@@ -1,8 +1,9 @@
 import * as React from "react"
+import { useEffect, useCallback, useState } from "react"
 import useEmblaCarousel from "embla-carousel-react";
 import { ArrowLeft, ArrowRight } from "lucide-react"
 
-import { cn } from "@/lib/utils"
+import { cn } from "../../lib/utils"
 import { Button } from "@/components/ui/button"
 
 const CarouselContext = React.createContext(null)
@@ -33,10 +34,10 @@ const Carousel = React.forwardRef((
     ...opts,
     axis: orientation === "horizontal" ? "x" : "y",
   }, plugins)
-  const [canScrollPrev, setCanScrollPrev] = React.useState(false)
-  const [canScrollNext, setCanScrollNext] = React.useState(false)
+  const [canScrollPrev, setCanScrollPrev] = useState(false)
+  const [canScrollNext, setCanScrollNext] = useState(false)
 
-  const onSelect = React.useCallback((api) => {
+  const onSelect = useCallback((api) => {
     if (!api) {
       return
     }
@@ -45,15 +46,15 @@ const Carousel = React.forwardRef((
     setCanScrollNext(api.canScrollNext())
   }, [])
 
-  const scrollPrev = React.useCallback(() => {
+  const scrollPrev = useCallback(() => {
     api?.scrollPrev()
   }, [api])
 
-  const scrollNext = React.useCallback(() => {
+  const scrollNext = useCallback(() => {
     api?.scrollNext()
   }, [api])
 
-  const handleKeyDown = React.useCallback((event) => {
+  const handleKeyDown = useCallback((event) => {
     if (event.key === "ArrowLeft") {
       event.preventDefault()
       scrollPrev()
@@ -63,7 +64,7 @@ const Carousel = React.forwardRef((
     }
   }, [scrollPrev, scrollNext])
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!api || !setApi) {
       return
     }
@@ -71,7 +72,7 @@ const Carousel = React.forwardRef((
     setApi(api)
   }, [api, setApi])
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!api) {
       return
     }
