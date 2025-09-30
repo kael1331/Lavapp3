@@ -2536,7 +2536,7 @@ const CalendarioSemanal = ({
     'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
   ];
 
-  // Generar slots de tiempo para un día
+  // Generar slots de tiempo para un día (con truncado del último turno)
   const generateTimeSlots = (horarioApertura, horarioCierre, duracionMinutos) => {
     const slots = [];
     const [aperturaHour, aperturaMin] = horarioApertura.split(':').map(Number);
@@ -2549,7 +2549,19 @@ const CalendarioSemanal = ({
       const hours = Math.floor(currentTime / 60);
       const minutes = currentTime % 60;
       const timeString = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
-      slots.push(timeString);
+      
+      // Verificar si hay tiempo suficiente para el servicio
+      const slotEndTime = currentTime + duracionMinutos;
+      
+      if (slotEndTime <= endTime) {
+        // Turno completo - se puede reservar normalmente
+        slots.push(timeString);
+      } else if (currentTime + 30 <= endTime) {
+        // Turno parcial - permitir si hay al menos 30 minutos disponibles (truncado)
+        slots.push(timeString);
+      }
+      // Si no hay al menos 30 minutos, no agregar el slot
+      
       currentTime += duracionMinutos;
     }
     
