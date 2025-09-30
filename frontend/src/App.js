@@ -2415,8 +2415,8 @@ const HomePage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Si ya está logueado, redirigir al dashboard
-    if (user) {
+    // Si es admin o superadmin, redirigir a su dashboard
+    if (user && (user.rol === 'ADMIN' || user.rol === 'SUPER_ADMIN')) {
       navigate('/dashboard');
       return;
     }
