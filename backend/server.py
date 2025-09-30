@@ -954,6 +954,109 @@ async def get_lavaderos_operativos():
     
     return lavaderos_enriquecidos
 
+# Obtener información específica de un lavadero
+@api_router.get("/lavaderos/{lavadero_id}")
+async def get_lavadero_by_id(lavadero_id: str):
+    # Buscar el lavadero por ID
+    lavadero = await db.lavaderos.find_one({"id": lavadero_id})
+    
+    if not lavadero:
+        raise HTTPException(status_code=404, detail="Lavadero no encontrado")
+    
+    # Obtener configuración del lavadero
+    config = await db.configuracion_lavadero.find_one({"lavadero_id": lavadero_id})
+    
+    # Obtener información del admin
+    admin_info = await db.users.find_one({"id": lavadero["admin_id"]})
+    
+    # Determinar estado de apertura/cierre
+    estado_apertura = "Cerrado"  # Por defecto cerrado
+    if config and config.get("esta_abierto", False):
+        estado_apertura = "Abierto"
+    
+    return {
+        "id": lavadero["id"],
+        "nombre": lavadero["nombre"],
+        "admin_id": lavadero["admin_id"],
+        "direccion": lavadero["direccion"],
+        "telefono": lavadero.get("telefono"),
+        "descripcion": lavadero.get("descripcion"),
+        "estado_apertura": estado_apertura,
+        "admin_nombre": admin_info["nombre"] if admin_info else "No disponible",
+        "admin_email": admin_info["email"] if admin_info else "No disponible",
+        "created_at": lavadero["created_at"]
+    }
+
+# Obtener configuración completa de un lavadero (horarios, precios, tipos de vehículos)
+@api_router.get("/lavaderos/{lavadero_id}/configuracion")
+async def get_lavadero_configuracion(lavadero_id: str):
+    # Verificar que el lavadero existe
+    lavadero = await db.lavaderos.find_one({"id": lavadero_id})
+    if not lavadero:
+        raise HTTPException(status_code=404, detail="Lavadero no encontrado")
+    
+    # Obtener configuración del lavadero
+    config = await db.configuracion_lavadero.find_one({"lavadero_id": lavadero_id})
+    
+    if not config:
+        # Crear configuración por defecto con tipos de vehículos básicos
+        tipos_vehiculo_default = [
+            {
+                "tipo": "auto",
+                "nombre": "Auto/Sedan",
+                "precio": 2500.0,
+                "activo": True,
+                "icono": "🚗"
+            },
+            {
+                "tipo": "suv",
+                "nombre": "SUV/Pickup",
+                "precio": 3500.0,
+                "activo": True,
+                "icono": "🚙"
+            },
+            {
+                "tipo": "moto",
+                "nombre": "Motocicleta",
+                "precio": 1500.0,
+                "activo": True,
+                "icono": "🏍️"
+            }
+        ]
+        
+        default_config = {
+            "id": str(uuid.uuid4()),
+            "lavadero_id": lavadero_id,
+            "direccion": lavadero.get("direccion", ""),
+            "latitud": -26.8241,  # San Miguel de Tucumán por defecto
+            "longitud": -65.2226,
+            "esta_abierto": False,
+            "horario_apertura": "08:00",
+            "horario_cierre": "20:00",
+            "duracion_turno": 60,  # 60 minutos por turno
+            "tipos_vehiculo": tipos_vehiculo_default,
+            "dias_laborables": [1, 2, 3, 4, 5, 6],  # Lunes a Sábado
+            "alias_bancario": f"lavadero.{lavadero_id[:8]}.mp",
+            "configurado": True,
+            "created_at": datetime.now(timezone.utc)
+        }
+        
+        await db.configuracion_lavadero.insert_one(default_config)
+        config = default_config
+    
+    return {
+        "lavadero_id": config["lavadero_id"],
+        "horario_apertura": config.get("horario_apertura", "08:00"),
+        "horario_cierre": config.get("horario_cierre", "20:00"),
+        "duracion_turno": config.get("duracion_turno", 60),
+        "tipos_vehiculo": config.get("tipos_vehiculo", []),
+        "dias_laborables": config.get("dias_laborables", [1, 2, 3, 4, 5, 6]),
+        "esta_abierto": config.get("esta_abierto", False),
+        "alias_bancario": config.get("alias_bancario", ""),
+        "direccion": config.get("direccion", ""),
+        "configurado": config.get("configurado", False)
+    }
+
 # Obtener configuración de Super Admin (alias bancario)
 @api_router.get("/superadmin-config")
 async def get_superadmin_config():
