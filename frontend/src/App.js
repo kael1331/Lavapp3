@@ -2467,6 +2467,19 @@ const HomePage = () => {
     }
   };
 
+  // Función para manejar selección de lavadero
+  const handleLavaderoSelection = (lavadero) => {
+    if (user && user.rol === 'CLIENTE') {
+      // Si ya está logueado como cliente, ir directamente a la página de reserva
+      navigate(`/lavadero/${lavadero.id}/reservar`);
+    } else {
+      // Si no está logueado, guardar el lavadero y redirigir al login de cliente
+      sessionStorage.setItem('selected_lavadero_id', lavadero.id);
+      sessionStorage.setItem('from_lavadero_selection', 'true');
+      navigate('/client-login');
+    }
+  };
+
   // Detectar tamaño de pantalla para paginación responsive
   React.useEffect(() => {
     const updateItemsPerPage = () => {
