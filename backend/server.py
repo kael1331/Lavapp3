@@ -926,7 +926,7 @@ async def get_lavaderos_operativos():
     lavaderos_enriquecidos = []
     for lavadero in lavaderos:
         # Obtener configuración del lavadero para dirección actualizada
-        config = await db.configuracion_lavaderos.find_one({"admin_id": lavadero["admin_id"]})
+        config = await db.configuracion_lavadero.find_one({"lavadero_id": lavadero["id"]})
         
         # Determinar dirección a mostrar (configuración si existe, sino la original)
         direccion_actual = lavadero["direccion"]  # Dirección original del registro
