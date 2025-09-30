@@ -2467,6 +2467,269 @@ const ClientProfile = () => {
   );
 };
 
+// Componente de Calendario Semanal
+const CalendarioSemanal = ({ 
+  lavadero, 
+  configuracion, 
+  selectedDate, 
+  selectedTime, 
+  onDateSelect, 
+  onTimeSelect 
+}) => {
+  const [currentWeekStart, setCurrentWeekStart] = useState(() => {
+    // Obtener el inicio de la semana actual (lunes)
+    const today = new Date();
+    const dayOfWeek = today.getDay(); // 0 = domingo, 1 = lunes, etc.
+    const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek; // Calcular offset para llegar al lunes
+    const monday = new Date(today);
+    monday.setDate(today.getDate() + mondayOffset);
+    monday.setHours(0, 0, 0, 0);
+    return monday;
+  });
+  
+  const [availableSlots, setAvailableSlots] = useState({});
+  const [loading, setLoading] = useState(false);
+
+  // Obtener días de la semana actual
+  const weekDays = useMemo(() => {
+    const days = [];
+    for (let i = 0; i < 7; i++) {
+      const date = new Date(currentWeekStart);
+      date.setDate(currentWeekStart.getDate() + i);
+      days.push(date);
+    }
+    return days;
+  }, [currentWeekStart]);
+
+  // Nombres de días en español
+  const dayNames = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+  const monthNames = [
+    'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+    'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+  ];
+
+  // Generar slots de tiempo para un día
+  const generateTimeSlots = (horarioApertura, horarioCierre, duracionMinutos) => {
+    const slots = [];
+    const [aperturaHour, aperturaMin] = horarioApertura.split(':').map(Number);
+    const [cierreHour, cierreMin] = horarioCierre.split(':').map(Number);
+    
+    let currentTime = aperturaHour * 60 + aperturaMin; // Minutos desde medianoche
+    const endTime = cierreHour * 60 + cierreMin;
+    
+    while (currentTime < endTime) {
+      const hours = Math.floor(currentTime / 60);
+      const minutes = currentTime % 60;
+      const timeString = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+      slots.push(timeString);
+      currentTime += duracionMinutos;
+    }
+    
+    return slots;
+  };
+
+  // Verificar si un día es laborable
+  const isDayWorking = (date) => {
+    const dayOfWeek = date.getDay(); // 0 = domingo, 1 = lunes, etc.
+    return configuracion.dias_laborables.includes(dayOfWeek === 0 ? 7 : dayOfWeek);
+  };
+
+  // Verificar si una fecha es pasada
+  const isPastDate = (date) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return date < today;
+  };
+
+  // Verificar si un horario específico es pasado (solo para hoy)
+  const isPastTime = (date, timeString) => {
+    const today = new Date();
+    const isToday = date.toDateString() === today.toDateString();
+    
+    if (!isToday) return false;
+    
+    const [hours, minutes] = timeString.split(':').map(Number);
+    const slotTime = new Date(date);
+    slotTime.setHours(hours, minutes, 0, 0);
+    
+    return slotTime <= today;
+  };
+
+  // Navegar entre semanas
+  const navigateWeek = (direction) => {
+    const newWeekStart = new Date(currentWeekStart);
+    newWeekStart.setDate(currentWeekStart.getDate() + (direction * 7));
+    setCurrentWeekStart(newWeekStart);
+  };
+
+  // Obtener el rango de fechas de la semana actual
+  const getWeekRange = () => {
+    const endOfWeek = new Date(currentWeekStart);
+    endOfWeek.setDate(currentWeekStart.getDate() + 6);
+    
+    const startMonth = monthNames[currentWeekStart.getMonth()];
+    const endMonth = monthNames[endOfWeek.getMonth()];
+    const year = currentWeekStart.getFullYear();
+    
+    if (currentWeekStart.getMonth() === endOfWeek.getMonth()) {
+      return `${currentWeekStart.getDate()} - ${endOfWeek.getDate()} de ${startMonth} ${year}`;
+    } else {
+      return `${currentWeekStart.getDate()} de ${startMonth} - ${endOfWeek.getDate()} de ${endMonth} ${year}`;
+    }
+  };
+
+  // Manejar selección de horario
+  const handleTimeSlotClick = (date, timeString) => {
+    if (!isDayWorking(date) || isPastDate(date) || isPastTime(date, timeString)) {
+      return; // No permitir selección de slots no disponibles
+    }
+    
+    onDateSelect(date);
+    onTimeSelect(timeString);
+  };
+
+  // Verificar si un slot está seleccionado
+  const isSlotSelected = (date, timeString) => {
+    return selectedDate && 
+           selectedTime === timeString && 
+           date.toDateString() === selectedDate.toDateString();
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Header con navegación */}
+      <div className="flex items-center justify-between">
+        <button
+          onClick={() => navigateWeek(-1)}
+          className="flex items-center px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"
+        >
+          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
+          </svg>
+          Anterior
+        </button>
+        
+        <div className="text-center">
+          <h4 className="text-lg font-semibold text-gray-900">{getWeekRange()}</h4>
+          <p className="text-sm text-gray-600">Selecciona fecha y horario</p>
+        </div>
+        
+        <button
+          onClick={() => navigateWeek(1)}
+          className="flex items-center px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"
+        >
+          Siguiente
+          <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+      </div>
+
+      {/* Calendario semanal */}
+      <div className="grid grid-cols-7 gap-2">
+        {weekDays.map((day, dayIndex) => {
+          const isWorking = isDayWorking(day);
+          const isPast = isPastDate(day);
+          const isToday = day.toDateString() === new Date().toDateString();
+          
+          return (
+            <div key={dayIndex} className="min-h-[400px]">
+              {/* Header del día */}
+              <div className={`text-center p-3 rounded-t-lg border-b-2 ${
+                isToday 
+                  ? 'bg-blue-100 border-blue-300 text-blue-900' 
+                  : isWorking && !isPast
+                  ? 'bg-gray-50 border-gray-200 text-gray-900'
+                  : 'bg-gray-200 border-gray-300 text-gray-500'
+              }`}>
+                <div className="font-medium text-sm">{dayNames[day.getDay()]}</div>
+                <div className="text-lg font-bold">{day.getDate()}</div>
+                {isToday && <div className="text-xs">Hoy</div>}
+                {!isWorking && <div className="text-xs">No laboral</div>}
+                {isPast && isWorking && <div className="text-xs">Pasado</div>}
+              </div>
+
+              {/* Slots de tiempo */}
+              <div className={`space-y-1 p-2 rounded-b-lg border-l border-r border-b ${
+                isWorking && !isPast ? 'border-gray-200' : 'border-gray-300 bg-gray-50'
+              }`}>
+                {isWorking && !isPast ? (
+                  generateTimeSlots(
+                    configuracion.horario_apertura, 
+                    configuracion.horario_cierre, 
+                    configuracion.duracion_turno
+                  ).map((timeSlot) => {
+                    const isPastSlot = isPastTime(day, timeSlot);
+                    const isSelected = isSlotSelected(day, timeSlot);
+                    
+                    return (
+                      <button
+                        key={timeSlot}
+                        onClick={() => handleTimeSlotClick(day, timeSlot)}
+                        disabled={isPastSlot}
+                        className={`w-full py-2 px-2 text-xs rounded transition-colors ${
+                          isSelected
+                            ? 'bg-blue-600 text-white font-medium'
+                            : isPastSlot
+                            ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                            : 'bg-green-50 text-green-800 hover:bg-green-100 border border-green-200'
+                        }`}
+                      >
+                        {timeSlot}
+                      </button>
+                    );
+                  })
+                ) : (
+                  <div className="text-center py-8 text-gray-400 text-sm">
+                    {!isWorking ? 'No laboral' : 'No disponible'}
+                  </div>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Leyenda */}
+      <div className="flex flex-wrap gap-4 text-sm">
+        <div className="flex items-center">
+          <div className="w-4 h-4 bg-green-50 border border-green-200 rounded mr-2"></div>
+          <span className="text-gray-600">Disponible</span>
+        </div>
+        <div className="flex items-center">
+          <div className="w-4 h-4 bg-blue-600 rounded mr-2"></div>
+          <span className="text-gray-600">Seleccionado</span>
+        </div>
+        <div className="flex items-center">
+          <div className="w-4 h-4 bg-gray-200 rounded mr-2"></div>
+          <span className="text-gray-600">No disponible</span>
+        </div>
+        <div className="flex items-center">
+          <div className="w-4 h-4 bg-gray-50 border border-gray-300 rounded mr-2"></div>
+          <span className="text-gray-600">No laboral</span>
+        </div>
+      </div>
+
+      {/* Información de selección */}
+      {selectedDate && selectedTime && (
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div className="flex items-center">
+            <svg className="w-5 h-5 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            <div>
+              <div className="font-medium text-blue-900">Horario seleccionado</div>
+              <div className="text-blue-700">
+                {dayNames[selectedDate.getDay()]}, {selectedDate.getDate()} de {monthNames[selectedDate.getMonth()]} - {selectedTime}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 // Página de Reserva de Lavadero
 const ReservaLavadero = () => {
   const { id } = useParams();
