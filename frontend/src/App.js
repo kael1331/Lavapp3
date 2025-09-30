@@ -2570,10 +2570,25 @@ const CalendarioSemanal = ({
 
   // Verificar si un día es laborable
   const isDayWorking = (date) => {
+    // 1. Verificar si el día de la semana es laborable
     const dayOfWeek = date.getDay(); // 0 = domingo, 1 = lunes, etc.
     // Convertir de JavaScript (0=dom, 1=lun...) a backend (1=lun, 2=mar..., 7=dom)
     const backendDayOfWeek = dayOfWeek === 0 ? 7 : dayOfWeek;
-    return configuracion.dias_laborables && configuracion.dias_laborables.includes(backendDayOfWeek);
+    const isDayOfWeekWorking = configuracion.dias_laborables && configuracion.dias_laborables.includes(backendDayOfWeek);
+    
+    if (!isDayOfWeekWorking) {
+      return false; // Si el día de la semana no es laborable, no trabajar
+    }
+    
+    // 2. Verificar si el día específico NO está marcado como no laboral (feriado)
+    const dateString = date.toISOString().split('T')[0]; // YYYY-MM-DD format
+    const isHoliday = diasNoLaborales.some(dia => {
+      // Comparar fechas sin hora
+      const diaFecha = new Date(dia.fecha).toISOString().split('T')[0];
+      return diaFecha === dateString;
+    });
+    
+    return !isHoliday; // Trabajar solo si NO es feriado
   };
 
   // Verificar si una fecha es pasada
