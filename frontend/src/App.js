@@ -1856,7 +1856,20 @@ const ClientLogin = () => {
       if (result.success) {
         // Verificar que sea un cliente
         if (result.user.rol === 'CLIENTE') {
-          navigate('/'); // Redirigir al home en lugar del dashboard
+          // Verificar si viene de una selección de lavadero
+          const selectedLavaderoId = sessionStorage.getItem('selected_lavadero_id');
+          const fromLavaderoSelection = sessionStorage.getItem('from_lavadero_selection');
+          
+          if (fromLavaderoSelection && selectedLavaderoId) {
+            // Limpiar sessionStorage
+            sessionStorage.removeItem('selected_lavadero_id');
+            sessionStorage.removeItem('from_lavadero_selection');
+            // Redirigir a la página de reserva
+            navigate(`/lavadero/${selectedLavaderoId}/reservar`);
+          } else {
+            // Redirigir al home
+            navigate('/');
+          }
         } else {
           setErrors({
             general: 'Esta página es solo para clientes. Si eres administrador, usa el login de administradores.'
