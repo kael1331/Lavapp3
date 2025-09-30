@@ -2007,9 +2007,15 @@ async def update_configuracion_lavadero(config_data: ConfiguracionLavaderoCreate
             detail="Los días laborales deben estar entre 1 (Lunes) y 7 (Domingo)"
         )
     
-    # Actualizar configuración
+    # Actualizar configuración (sincronizar nombres de campos con endpoint público)
     update_data = {
         "$set": {
+            # Campos públicos (usados por el calendario de reservas)
+            "horario_apertura": config_data.hora_apertura,
+            "horario_cierre": config_data.hora_cierre,
+            "duracion_turno": config_data.duracion_turno_minutos,
+            "dias_laborables": config_data.dias_laborales,
+            # Campos legacy (para compatibilidad con admin)
             "hora_apertura": config_data.hora_apertura,
             "hora_cierre": config_data.hora_cierre,
             "duracion_turno_minutos": config_data.duracion_turno_minutos,
