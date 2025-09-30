@@ -533,18 +533,50 @@ const Navigation = ({ toggleSidebar }) => {
                   <p className="text-xs text-gray-500">{user.email}</p>
                 </div>
                 
-                <Link 
-                  to="/perfil"
-                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center space-x-2"
-                >
-                  <span>👤</span>
-                  <span>Mi Perfil</span>
-                </Link>
-                
-                <button className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center space-x-2">
-                  <span>⚙️</span>
-                  <span>Configuración</span>
-                </button>
+                {user.rol === 'CLIENTE' ? (
+                  // Opciones específicas para clientes
+                  <>
+                    <Link 
+                      to="/client-dashboard"
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center space-x-2"
+                    >
+                      <span>📊</span>
+                      <span>Mi Dashboard</span>
+                    </Link>
+                    
+                    <Link 
+                      to="/client-profile"
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center space-x-2"
+                    >
+                      <span>👤</span>
+                      <span>Mi Perfil</span>
+                    </Link>
+                    
+                    <Link 
+                      to="/"
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center space-x-2"
+                    >
+                      <span>🚿</span>
+                      <span>Buscar Lavaderos</span>
+                    </Link>
+                  </>
+                ) : (
+                  // Opciones para admins y super admins (mantener las originales)
+                  <>
+                    <Link 
+                      to="/perfil"
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center space-x-2"
+                    >
+                      <span>👤</span>
+                      <span>Mi Perfil</span>
+                    </Link>
+                    
+                    <button className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center space-x-2">
+                      <span>⚙️</span>
+                      <span>Configuración</span>
+                    </button>
+                  </>
+                )}
                 
                 <hr className="my-1" />
                 
