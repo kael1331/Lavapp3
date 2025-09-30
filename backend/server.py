@@ -1093,6 +1093,28 @@ async def get_lavadero_configuracion(lavadero_id: str):
         "configurado": config.get("configurado", False)
     }
 
+# Obtener días no laborales de un lavadero específico (endpoint público para calendario)
+@api_router.get("/lavaderos/{lavadero_id}/dias-no-laborales")
+async def get_lavadero_dias_no_laborales(lavadero_id: str):
+    # Verificar que el lavadero existe
+    lavadero = await db.lavaderos.find_one({"id": lavadero_id})
+    if not lavadero:
+        raise HTTPException(status_code=404, detail="Lavadero no encontrado")
+    
+    # Obtener días no laborales del lavadero
+    dias_cursor = db.dias_no_laborales.find({"lavadero_id": lavadero_id})
+    dias = await dias_cursor.to_list(1000)
+    
+    # Convert MongoDB documents to proper format (remove _id field)
+    result = []
+    for dia in dias:
+        dia_dict = dict(dia)
+        if '_id' in dia_dict:
+            del dia_dict['_id']  # Remove MongoDB ObjectId
+        result.append(dia_dict)
+    
+    return result
+
 # Obtener configuración de Super Admin (alias bancario)
 @api_router.get("/superadmin-config")
 async def get_superadmin_config():
