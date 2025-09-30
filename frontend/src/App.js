@@ -2908,19 +2908,21 @@ const ReservaLavadero = () => {
         <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
           <h3 className="text-xl font-bold text-gray-900 mb-4">📅 Seleccionar Fecha y Hora</h3>
           
-          <CalendarioSemanal 
-            lavadero={lavadero}
-            configuracion={{
-              horario_apertura: "08:00",
-              horario_cierre: "20:00", 
-              duracion_turno: 60,
-              dias_laborables: [1, 2, 3, 4, 5, 6] // Lunes a Sábado
-            }}
-            selectedDate={selectedDate}
-            selectedTime={selectedTime}
-            onDateSelect={setSelectedDate}
-            onTimeSelect={setSelectedTime}
-          />
+          {configuracionLavadero ? (
+            <CalendarioSemanal 
+              lavadero={lavadero}
+              configuracion={configuracionLavadero}
+              selectedDate={selectedDate}
+              selectedTime={selectedTime}
+              onDateSelect={setSelectedDate}
+              onTimeSelect={setSelectedTime}
+            />
+          ) : (
+            <div className="text-center py-8 text-gray-500">
+              <div className="animate-spin w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full mx-auto mb-4"></div>
+              <p>Cargando horarios disponibles...</p>
+            </div>
+          )}
         </div>
 
         {/* Resumen y Confirmación */}
