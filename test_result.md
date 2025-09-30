@@ -105,13 +105,13 @@
 user_problem_statement: "Verificar el estado actual del sistema LavApp antes de implementar correcciones en el sistema de reservas. El usuario reporta que el sistema debe funcionar correctamente y proporciona las siguientes credenciales de testing: Administradores: kael1@lavadero.com, kael2@lavadero.com, kael3@lavadero.com, kael4@lavadero.com (contraseña: kael1331). Cliente: kael11@lavadero.com (contraseña: kael1331). OBJETIVOS DE VERIFICACIÓN: 1) Confirmar que las credenciales funcionan, 2) Verificar que existen lavaderos operativos, 3) Comprobar que el sistema de reservas básico está funcional, 4) Validar que la configuración de lavaderos se carga correctamente."
 
 backend:
-  - task: "Verificar funcionalidad backend después de cambios visuales"
+  - task: "Verificar credenciales de usuario proporcionadas por el cliente"
     implemented: true
-    working: true
+    working: false
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: true
         agent: "testing"
