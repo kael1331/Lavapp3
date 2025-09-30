@@ -288,7 +288,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Implementar nueva funcionalidad de mostrar alias bancario del Super Admin en página de comprobantes"
+    - "Verificar credenciales de usuario proporcionadas por el cliente"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
