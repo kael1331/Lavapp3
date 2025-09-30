@@ -5119,6 +5119,27 @@ const ConfiguracionLavadero = () => {
         </p>
       </div>
 
+      {/* Nombre del Lavadero */}
+      <div className="bg-orange-50 border border-orange-200 p-6 rounded-lg shadow mb-8">
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Nombre del Lavadero
+            </label>
+            <input
+              type="text"
+              value={configuracion.nombre_lavadero || ''}
+              onChange={(e) => handleConfigChange('nombre_lavadero', e.target.value)}
+              placeholder="Ingresa el nombre de tu lavadero"
+              className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-lg"
+            />
+            <p className="text-sm text-gray-600 mt-2">
+              Este nombre aparecerá en la lista de lavaderos disponibles para los clientes.
+            </p>
+          </div>
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Configuración Básica */}
         <div className="bg-white p-6 rounded-lg shadow">
