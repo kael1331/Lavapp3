@@ -1520,7 +1520,7 @@ const ClientRegister = () => {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const navigate = useNavigate();
-  const { register, loginWithGoogle } = useAuth();
+  const { register, login, loginWithGoogle } = useAuth();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
