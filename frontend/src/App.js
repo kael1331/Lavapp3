@@ -2737,10 +2737,11 @@ const ReservaLavadero = () => {
   const navigate = useNavigate();
   
   const [lavadero, setLavadero] = useState(null);
+  const [configuracionLavadero, setConfiguracionLavadero] = useState(null);
   const [loading, setLoading] = useState(true);
   const [tiposVehiculo, setTiposVehiculo] = useState([]);
   const [selectedVehiculo, setSelectedVehiculo] = useState('');
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState(null);
   const [selectedTime, setSelectedTime] = useState('');
   const [precioSeleccionado, setPrecioSeleccionado] = useState(0);
   
