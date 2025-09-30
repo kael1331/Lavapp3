@@ -2498,6 +2498,7 @@ const CalendarioSemanal = ({
   
   const [availableSlots, setAvailableSlots] = useState({});
   const [loading, setLoading] = useState(false);
+  const [diasNoLaborales, setDiasNoLaborales] = useState([]);
 
   // Obtener días de la semana actual
   const weekDays = useMemo(() => {
