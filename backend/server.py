@@ -1044,12 +1044,47 @@ async def get_lavadero_configuracion(lavadero_id: str):
         await db.configuracion_lavadero.insert_one(default_config)
         config = default_config
     
+    # Construir tipos de vehículos desde los campos de configuración
+    tipos_vehiculo = []
+    
+    # Verificar si tiene configuración nueva (array tipos_vehiculo) o antigua (campos separados)
+    if config.get("tipos_vehiculo"):
+        tipos_vehiculo = config["tipos_vehiculo"]
+    else:
+        # Construir desde campos separados (configuración antigua)
+        if config.get("servicio_motos", False):
+            tipos_vehiculo.append({
+                "tipo": "moto",
+                "nombre": "Motocicleta",
+                "precio": config.get("precio_motos", 1500.0),
+                "activo": True,
+                "icono": "🏍️"
+            })
+        
+        if config.get("servicio_autos", False):
+            tipos_vehiculo.append({
+                "tipo": "auto", 
+                "nombre": "Auto/Sedan",
+                "precio": config.get("precio_autos", 2500.0),
+                "activo": True,
+                "icono": "🚗"
+            })
+        
+        if config.get("precio_camionetas"):  # Si existe precio de camionetas, agregarlo
+            tipos_vehiculo.append({
+                "tipo": "camioneta",
+                "nombre": "Camioneta/SUV", 
+                "precio": config.get("precio_camionetas", 3500.0),
+                "activo": True,
+                "icono": "🚙"
+            })
+
     return {
         "lavadero_id": config["lavadero_id"],
         "horario_apertura": config.get("horario_apertura", "08:00"),
         "horario_cierre": config.get("horario_cierre", "20:00"),
         "duracion_turno": config.get("duracion_turno", 60),
-        "tipos_vehiculo": config.get("tipos_vehiculo", []),
+        "tipos_vehiculo": tipos_vehiculo,
         "dias_laborables": config.get("dias_laborables", [1, 2, 3, 4, 5, 6]),
         "esta_abierto": config.get("esta_abierto", False),
         "alias_bancario": config.get("alias_bancario", ""),
