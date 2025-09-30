@@ -1729,7 +1729,6 @@ const HomePage = () => {
             )}
           </>
         )}
-      </div>
 
         {/* Información adicional */}
         <div className="mt-16 bg-white rounded-lg shadow-sm p-8">
