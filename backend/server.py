@@ -1966,6 +1966,10 @@ async def get_configuracion_lavadero(request: Request):
     config_dict = dict(config_doc)
     if '_id' in config_dict:
         del config_dict['_id']
+    
+    # Agregar nombre del lavadero desde el documento del lavadero
+    config_dict['nombre_lavadero'] = lavadero_doc.get("nombre", "")
+    
     return config_dict
 
 # Actualizar configuración del lavadero (Admin)
