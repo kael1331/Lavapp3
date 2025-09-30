@@ -4234,6 +4234,22 @@ function App() {
                 <GestionAdmins />
               </ProtectedRoute>
             } />
+            
+            {/* ========== RUTAS DE CLIENTES ========== */}
+            <Route path="/client-register" element={<ClientRegister />} />
+            <Route path="/client-login" element={<ClientLogin />} />
+            
+            <Route path="/client-dashboard" element={
+              <ProtectedRoute requiredRole="CLIENTE">
+                <ClientDashboard />
+              </ProtectedRoute>
+            } />
+            
+            <Route path="/client-profile" element={
+              <ProtectedRoute requiredRole="CLIENTE">
+                <ClientProfile />
+              </ProtectedRoute>
+            } />
                   </Routes>
                 </div>
               </>
