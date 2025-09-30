@@ -2467,6 +2467,225 @@ const ClientProfile = () => {
   );
 };
 
+// Página de Reserva de Lavadero
+const ReservaLavadero = () => {
+  const { id } = useParams();
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  
+  const [lavadero, setLavadero] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [tiposVehiculo, setTiposVehiculo] = useState([]);
+  const [selectedVehiculo, setSelectedVehiculo] = useState('');
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedTime, setSelectedTime] = useState('');
+  const [precioSeleccionado, setPrecioSeleccionado] = useState(0);
+  
+  useEffect(() => {
+    fetchLavaderoInfo();
+  }, [id]);
+
+  const fetchLavaderoInfo = async () => {
+    try {
+      // Obtener información del lavadero
+      const lavaderoResponse = await axios.get(`${API}/lavaderos/${id}`);
+      setLavadero(lavaderoResponse.data);
+      
+      // Obtener configuración del lavadero (tipos de vehículos y precios)
+      const configResponse = await axios.get(`${API}/lavaderos/${id}/configuracion`);
+      if (configResponse.data.tipos_vehiculo) {
+        setTiposVehiculo(configResponse.data.tipos_vehiculo);
+      }
+    } catch (error) {
+      console.error('Error fetching lavadero info:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVehiculoChange = (tipo) => {
+    setSelectedVehiculo(tipo);
+    const vehiculoData = tiposVehiculo.find(v => v.tipo === tipo);
+    setPrecioSeleccionado(vehiculoData?.precio || 0);
+  };
+
+  const handleConfirmarReserva = () => {
+    // TODO: Implementar confirmación de reserva
+    console.log('Confirmar reserva:', {
+      lavadero: id,
+      vehiculo: selectedVehiculo,
+      fecha: selectedDate,
+      hora: selectedTime,
+      precio: precioSeleccionado
+    });
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  if (!lavadero) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">Lavadero no encontrado</h2>
+          <button
+            onClick={() => navigate('/')}
+            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+          >
+            Volver al inicio
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-white shadow">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center py-6">
+            <div className="flex items-center">
+              <button
+                onClick={() => navigate('/')}
+                className="mr-4 text-gray-600 hover:text-gray-900"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+              <h1 className="text-2xl font-bold text-gray-900">Reservar Turno</h1>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Información del Lavadero */}
+        <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-2xl font-bold text-gray-900">{lavadero.nombre}</h2>
+            <span className={`px-3 py-1 text-sm font-medium rounded-full ${
+              lavadero.estado_apertura === 'Abierto' 
+                ? 'bg-green-100 text-green-800' 
+                : 'bg-red-100 text-red-800'
+            }`}>
+              {lavadero.estado_apertura || 'Cerrado'}
+            </span>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <p className="text-gray-600 mb-2">
+                <span className="font-medium">📍 Dirección:</span> {lavadero.direccion}
+              </p>
+              {lavadero.descripcion && (
+                <p className="text-gray-600 mb-2">
+                  <span className="font-medium">📝 Descripción:</span> {lavadero.descripcion}
+                </p>
+              )}
+            </div>
+            
+            {/* Información adicional */}
+            <div className="bg-blue-50 p-4 rounded-lg">
+              <h3 className="font-medium text-blue-900 mb-2">💡 Información importante</h3>
+              <ul className="text-sm text-blue-800 space-y-1">
+                <li>• Puedes reservar aunque el lavadero esté "cerrado"</li>
+                <li>• Solo se respetan días y horarios laborables</li>
+                <li>• La confirmación es manual por el administrador</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        {/* Selección de Vehículo */}
+        <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
+          <h3 className="text-xl font-bold text-gray-900 mb-4">🚗 Tipo de Vehículo</h3>
+          
+          {tiposVehiculo.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {tiposVehiculo.map((vehiculo) => (
+                <button
+                  key={vehiculo.tipo}
+                  onClick={() => handleVehiculoChange(vehiculo.tipo)}
+                  className={`p-4 rounded-lg border-2 transition-colors ${
+                    selectedVehiculo === vehiculo.tipo
+                      ? 'border-blue-500 bg-blue-50'
+                      : 'border-gray-200 hover:border-gray-300'
+                  }`}
+                >
+                  <div className="text-center">
+                    <div className="text-2xl mb-2">{vehiculo.icono || '🚗'}</div>
+                    <div className="font-medium text-gray-900">{vehiculo.nombre}</div>
+                    <div className="text-lg font-bold text-blue-600 mt-1">
+                      ${vehiculo.precio?.toLocaleString() || 0}
+                    </div>
+                  </div>
+                </button>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8 text-gray-500">
+              <p>No hay tipos de vehículos configurados para este lavadero.</p>
+              <p className="text-sm mt-2">Contacta al administrador del lavadero.</p>
+            </div>
+          )}
+        </div>
+
+        {/* Vista Semanal de Horarios */}
+        <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
+          <h3 className="text-xl font-bold text-gray-900 mb-4">📅 Seleccionar Fecha y Hora</h3>
+          
+          <div className="text-center py-12 text-gray-500">
+            <div className="text-6xl mb-4">🚧</div>
+            <h4 className="text-lg font-medium mb-2">Vista Semanal en Desarrollo</h4>
+            <p className="mb-4">Próximamente: Vista semanal con slots de tiempo disponibles</p>
+          </div>
+        </div>
+
+        {/* Resumen y Confirmación */}
+        {selectedVehiculo && (
+          <div className="bg-white rounded-lg shadow-sm p-6">
+            <h3 className="text-xl font-bold text-gray-900 mb-4">📋 Resumen de Reserva</h3>
+            
+            <div className="space-y-3 mb-6">
+              <div className="flex justify-between">
+                <span className="text-gray-600">Lavadero:</span>
+                <span className="font-medium">{lavadero.nombre}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Tipo de vehículo:</span>
+                <span className="font-medium">{selectedVehiculo}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Precio:</span>
+                <span className="font-bold text-blue-600">${precioSeleccionado.toLocaleString()}</span>
+              </div>
+              {/* TODO: Agregar fecha y hora seleccionada */}
+            </div>
+
+            <div className="border-t pt-4">
+              <button
+                onClick={handleConfirmarReserva}
+                disabled={!selectedVehiculo}
+                className="w-full bg-blue-600 text-white py-3 px-4 rounded-md font-medium hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
+              >
+                Continuar con la Reserva
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
 // Página de Inicio (Dual)
 const HomePage = () => {
   const [lavaderos, setLavaderos] = useState([]);
