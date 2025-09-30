@@ -2757,6 +2757,8 @@ const ReservaLavadero = () => {
       
       // Obtener configuración del lavadero (tipos de vehículos y precios)
       const configResponse = await axios.get(`${API}/lavaderos/${id}/configuracion`);
+      setConfiguracionLavadero(configResponse.data);
+      
       if (configResponse.data.tipos_vehiculo) {
         setTiposVehiculo(configResponse.data.tipos_vehiculo);
       }
