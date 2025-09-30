@@ -2787,7 +2787,26 @@ const CalendarioSemanal = ({
           <div className="w-4 h-4 bg-gray-50 border border-gray-300 rounded mr-2"></div>
           <span className="text-gray-600">No laboral</span>
         </div>
+        <div className="flex items-center">
+          <div className="w-4 h-4 bg-red-100 border border-red-300 rounded mr-2"></div>
+          <span className="text-gray-600">Feriado</span>
+        </div>
       </div>
+      
+      {/* Información de configuración del lavadero */}
+      {configuracion && (
+        <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm">
+          <div className="font-medium text-gray-700 mb-1">Configuración del lavadero:</div>
+          <div className="text-gray-600 space-x-4">
+            <span>🕒 {configuracion.horario_apertura} - {configuracion.horario_cierre}</span>
+            <span>⏱️ {configuracion.duracion_turno} min/turno</span>
+            <span>📅 {configuracion.dias_laborables?.length || 0} días laborables</span>
+            {diasNoLaborales?.length > 0 && (
+              <span>🚫 {diasNoLaborales.length} feriados configurados</span>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Información de selección */}
       {selectedDate && selectedTime && (
