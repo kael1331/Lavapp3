@@ -113,9 +113,9 @@ backend:
     priority: "high"
     needs_retesting: true
     status_history:
-      - working: true
-        agent: "testing"
-        comment: "✅ VERIFICACIÓN COMPLETA EXITOSA - Probé todos los endpoints críticos mencionados en el review request después de los cambios visuales (emoji consistency 🧺→🚿 y logo clickeable). RESULTADOS: ✅ Super Admin login funciona correctamente (kearcangel@gmail.com/K@#l1331), ✅ GET /superadmin/admins devuelve 3 admins correctamente, ✅ GET /superadmin/comprobantes-historial devuelve 8 comprobantes con estructura correcta, ✅ GET /superadmin/credenciales-testing devuelve 3 credenciales, ✅ Admin regular login funciona (maria@lavaderocentro.com/maria123), ✅ GET /admin/configuracion devuelve configuración con 9 settings, ✅ Dashboard stats funcionan para ambos tipos de usuario. CONCLUSIÓN: Los cambios visuales NO afectaron la funcionalidad del backend. Todos los endpoints críticos funcionan correctamente. Success rate: 100% (8/8 tests passed)."
+      - working: false
+        agent: "main"
+        comment: "El usuario proporcionó credenciales específicas (kael1@lavadero.com/kael1331, etc.) pero el login frontend muestra 'Error al iniciar sesión'. Necesito verificar si estas credenciales existen en la base de datos y si los endpoints de autenticación están funcionando correctamente."
 
   - task: "Crear endpoint toggle para activar/desactivar lavadero"
     implemented: true
