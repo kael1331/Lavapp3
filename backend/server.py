@@ -935,7 +935,7 @@ async def get_lavaderos_operativos():
         
         # Determinar estado de apertura/cierre
         estado_apertura = "Cerrado"  # Por defecto cerrado
-        if config and config.get("is_abierto", False):
+        if config and config.get("esta_abierto", False):
             estado_apertura = "Abierto"
         
         # Crear respuesta enriquecida
